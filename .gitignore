@@ -136,3 +136,5 @@ static/
 **/migrations/**
 !**/migrations
 !**/migrations/__init__.py
+
+.DS_Store
