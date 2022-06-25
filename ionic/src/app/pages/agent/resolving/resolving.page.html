@@ -1,0 +1,195 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Resolving</ion-title>
+
+    <ion-buttons slot="start">
+      <ion-button horizontal="end" fill="clear" size="small" (click)="back()">
+        <ion-icon slot="end" name="arrow-back-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    
+  </ion-toolbar>
+</ion-header>
+
+<ion-content padding>
+ 
+  <ion-card>
+      <form [formGroup]="resolvingForm" (ngSubmit)="getLocation()" novalidate style="padding: 20px;">
+    
+          <ion-list padding>
+            
+            <div style="text-align: center">
+              <ion-button (click)="goToLocation()" (keyup.enter)="goToLocation()" color="light" style="width: 100%;">
+                 
+                <ion-icon  name="locate-outline"></ion-icon> Go to location
+              </ion-button>
+            </div>
+            <br/>
+            <br/>
+
+            <div style="text-align: center">
+              <ion-button (click)="refer()" (keyup.enter)="refer()" color="light" style="width: 100%;">
+                 
+                <ion-icon name="swap-horizontal-outline"></ion-icon> Or refer
+              </ion-button>
+            </div>
+            <br/>
+            <br/>
+
+            <ion-item>
+              <ion-label style="font-weight: bold">
+                Confirm the problem *
+              </ion-label>
+            </ion-item>
+            <ion-item style="margin-left: 15px;">
+              <ion-label>Problem</ion-label>
+              <ion-select interface="popover" #a (keyup.enter)="moveFocus(b)" formControlName="problem" >
+                <ion-select-option required *ngFor="let problem of problems" value="{{problem}}">
+                  {{problem}}
+                </ion-select-option>
+              </ion-select>
+            </ion-item>
+            <span class="error ion-padding" style="color: red;" *ngIf="isSubmitted && errorControl.problem.errors?.required">
+              Problem required.
+            </span>
+            <br/>
+
+            <ion-item>
+              <ion-label style="font-weight: bold">
+                Confirm the severity of the damage *
+              </ion-label>
+            </ion-item>
+            <ion-item style="margin-left: 15px;">
+              <ion-label>
+                Severe
+              </ion-label>
+              <ion-select interface="popover" #b (keyup.enter)="moveFocus(c)" formControlName="severity" >
+                <ion-select-option required *ngFor="let severe of severity" value="{{severe}}">
+                  {{severe}}
+                </ion-select-option>
+              </ion-select>
+            </ion-item>
+            <span class="error ion-padding" style="color: red; margin-left: 15px;" *ngIf="isSubmitted && errorControl.severity.errors?.required">
+              Severity required.
+            </span>
+            <br/>
+
+            <ion-item>
+              <ion-label style="font-weight: bold">
+                Confirm the fault position *
+              </ion-label>
+            </ion-item>
+            <ion-item style="margin-left: 15px;">
+              <ion-label>
+                Position
+              </ion-label>
+              <ion-select interface="popover" #c (keyup.enter)="moveFocus(d)" formControlName="position" >
+                <ion-select-option required *ngFor="let position of positions" value="{{position}}">
+                  {{position}}
+                </ion-select-option>
+              </ion-select>
+            </ion-item>
+            <span class="error ion-padding" style="color: red; margin-left: 15px;" *ngIf="isSubmitted && errorControl.position.errors?.required">
+              Position required.
+            </span>
+            <br/>
+
+            <ion-item>
+              <ion-label style="font-weight: bold">
+                Confirm the type of area *
+              </ion-label>
+            </ion-item>
+            <ion-item style="margin-left: 15px;">
+              <ion-label>
+                Area
+              </ion-label>
+              <ion-select interface="popover" #d (keyup.enter)="moveFocus(e)" formControlName="area" >
+                <ion-select-option required *ngFor="let area of areas" value="{{area}}">
+                  {{area}}
+                </ion-select-option>
+              </ion-select>
+            </ion-item>
+            <span class="error ion-padding" style="color: red; margin-left: 15px;" *ngIf="isSubmitted && errorControl.area.errors?.required">
+              Area required.
+            </span>
+            <br/>
+
+            <ion-item>
+              <ion-label style="font-weight: bold">How was it resolved?*</ion-label>
+            </ion-item>
+            <ion-item style="margin-left: 15px;">
+              <ion-textarea placeholder="Optional" #e (keyup.enter)="moveFocus(f)" formControlName="description" rows="3"></ion-textarea>
+            </ion-item>
+            <span class="error ion-padding" style="color: red; margin-left: 15px;" *ngIf="isSubmitted && errorControl.description.errors?.required">
+              Description required.
+            </span>
+            <span class="error ion-padding" style="color: red" *ngIf="isSubmitted && errorControl.description.errors?.minlength">
+              Description is too short.
+            </span>
+            <br/>
+
+            <ion-item>
+              <ion-label style="font-weight: bold">Images of solution</ion-label>
+            </ion-item>
+
+              <ion-row>
+                
+                <ion-col size="6" (click)="capture('1')">
+                  <ion-card style="height: unset">
+                    <ion-card-content *ngIf="utils.platformIs == 'mobile'" style="text-align: center; background-color: whitesmoke; max-height: 150px; min-height: 150px;">
+                      <img [src]="event.photo_1" style="width: 100px; height: 100px; margin: auto;">
+                    </ion-card-content>
+                    <ion-card-content *ngIf="utils.platformIs != 'mobile'" style="text-align: center; background-color: whitesmoke; height: 300px">
+                      <img [src]="event.photo_1" style="width: 200px; margin: auto;">
+                    </ion-card-content>
+                  </ion-card>
+                </ion-col>
+
+                <ion-col size="6" (click)="capture('2')">
+                  <ion-card style="height: unset">
+                    <ion-card-content *ngIf="utils.platformIs == 'mobile'" style="text-align: center; background-color: whitesmoke; max-height: 150px; min-height: 150px;">
+                      <img [src]="event.photo_2" style="width: 100px; height: 100px; margin: auto;">
+                    </ion-card-content>
+                    <ion-card-content *ngIf="utils.platformIs != 'mobile'" style="text-align: center; background-color: whitesmoke; height: 300px">
+                      <img [src]="event.photo_2" style="width: 200px; margin: auto;">
+                    </ion-card-content>
+                  </ion-card>
+                </ion-col>
+                
+                <ion-col size="6" (click)="capture('3')">
+                  <ion-card style="height: unset">
+                    <ion-card-content *ngIf="utils.platformIs == 'mobile'" style="text-align: center; background-color: whitesmoke; max-height: 150px; min-height: 150px;">
+                      <img [src]="event.photo_3" style="width: 100px; height: 100px; margin: auto;">
+                    </ion-card-content>
+                    <ion-card-content *ngIf="utils.platformIs != 'mobile'" style="text-align: center; background-color: whitesmoke; height: 300px">
+                      <img [src]="event.photo_3" style="width: 200px; margin: auto;">
+                    </ion-card-content>
+                  </ion-card>
+                </ion-col>
+
+                <ion-col size="6" (click)="capture('4')">
+                  <ion-card style="height: unset">
+                    <ion-card-content *ngIf="utils.platformIs == 'mobile'" style="text-align: center; background-color: whitesmoke; max-height: 150px; min-height: 150px;">
+                      <img [src]="event.photo_4" style="width: 100px; height: 100px; margin: auto;">
+                    </ion-card-content>
+                    <ion-card-content *ngIf="utils.platformIs != 'mobile'" style="text-align: center; background-color: whitesmoke; height: 300px">
+                      <img [src]="event.photo_4" style="width: 200px; margin: auto;">
+                    </ion-card-content>
+                  </ion-card>
+                </ion-col>
+            
+              </ion-row>
+            <br/>
+            <br/>
+
+            <div style="text-align: center">
+              <ion-button #f color="success" type="submit"> Resolve </ion-button>
+            </div>
+          
+          </ion-list>
+
+      </form>
+  </ion-card>
+ 
+</ion-content>
+

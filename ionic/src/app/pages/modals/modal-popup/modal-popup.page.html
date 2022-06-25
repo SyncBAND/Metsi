@@ -1,0 +1,312 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title *ngIf="title!='Calendar'">{{title}}</ion-title>
+    <ion-title *ngIf="title=='Calendar'">{{calendar_data.name}}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="closeModal()">
+        <ion-icon slot="icon-only" name="close"></ion-icon>
+       </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header> 
+
+<ion-content padding text-center>
+
+    <div *ngIf="title=='Cancel'" style="text-align: center; padding: 10px; width: 100%;">
+
+        <form [formGroup]="modalForm" (ngSubmit)="submit()" novalidate style="padding: 20px;">
+            
+            <ion-list margin-top margin-bottom>
+                <ion-item>
+                    <ion-textarea placeholder="Please give us more details" (keyup.enter)="rate()" formControlName="description" rows="3"></ion-textarea>
+                </ion-item>
+                <span class="error ion-padding" style="color: red" *ngIf="isSubmitted && errorControl.description.errors?.required">Description is required.</span>
+                <span class="error ion-padding" style="color: red" *ngIf="isSubmitted && errorControl.description.errors?.minlength">Description length is too short.</span>
+            </ion-list>
+
+            <br>
+            <ion-button type="submit" class="goodfont boton" margin-bottom expand="block" >{{title}}</ion-button>
+            <br/><br>
+        </form>
+   
+    </div>
+    <div *ngIf="title=='Rate'" style="text-align: center; padding: 10px; width: 100%;">
+
+        <form [formGroup]="rateForm" (ngSubmit)="rate()" novalidate style="padding: 20px;">
+
+            <ion-item *ngIf="mode=='AGENT'">
+                Rate the customer based on the interaction 
+            </ion-item>
+            <ion-item *ngIf="mode == 'ENDUSER'">
+                Rate the agent based on the service 
+            </ion-item>
+            <ion-list margin-top margin-bottom>
+        
+                <ion-item>
+                    <ion-textarea placeholder="Please give us more details (optional)" formControlName="details" rows="3"></ion-textarea>
+                </ion-item>
+                
+            </ion-list>
+
+            <br/><br>
+            <ion-item>
+                <label>Note: 1 is least satisfied and 5 is most satisfied</label>
+            </ion-item>
+            <br/><br>
+            <app-ratings [(rating)]="rating"></app-ratings>
+            <br><br>
+            <ion-button type="submit" class="goodfont boton" margin-bottom  expand="block" >{{title}}</ion-button>
+            
+        </form>
+
+    </div>
+    <div *ngIf="title=='Activate'" style="text-align: center; padding: 10px; width: 100%;">
+        
+
+        <br/><br>
+        <p>Before you can reserve any bookings, you need to set your agent activation pin on the app</p>
+        <p>Get your activation pin sent via email</p>
+        <br/>
+        <ion-button [color]="primary" (click)="get_activation_pin()"> Get Pin </ion-button>
+            
+        <br/><br><br>
+        <p>Then, use your the pin below</p>
+        <br>
+        <ion-list margin-top margin-bottom>
+            <ion-item>
+                <ion-input type="text" placeholder="Enter your pin to activate" [(ngModel)]="agent_pin"></ion-input>
+                <ion-button [color]="primary" (click)="activate_agent()"> {{title}} </ion-button>
+            </ion-item>
+        </ion-list>
+
+    </div>
+    <div *ngIf="title=='Interested'" style="text-align: center; padding: 10px; width: 100%;">
+        
+
+        <br/><br>
+        <p>Confirm the call out fee and that you are happy with the times below</p>
+        
+        <br/><br>
+        
+        <form [formGroup]="interestedForm" (ngSubmit)="interested()" novalidate style="padding: 20px;">
+            <ion-list margin-top margin-bottom>
+        
+                <ion-item>
+                    <ion-input type="text" placeholder="Enter your call out fee here" formControlName="callout_fee"></ion-input>
+                </ion-item>
+                
+                <ion-item>
+                    <ion-label>From</ion-label>
+                    <ion-datetime displayFormat="MM/DD/YYYY HH:mm" #e (keyup.enter)="moveFocus(f)" pickerFormat="MMM D:HH:mm" formControlName="starttime" [min]="mindate"></ion-datetime>
+                </ion-item>
+            
+                <ion-item>
+                    <ion-label>To</ion-label>
+                    <ion-datetime displayFormat="MM/DD/YYYY HH:mm" #f (keyup.enter)="moveFocus(g)" pickerFormat="MMM D:HH:mm" formControlName="endtime" [min]="interestedForm.controls.starttime.value"></ion-datetime>
+                </ion-item>
+                <p style="margin-left: 15px; margin-top: 3px; font-style: italic; color: blue;">Note: This is the date and time the customer has set. Update it to let them know what time you can make it.</p>
+              
+            </ion-list>
+
+            <br>
+            <ion-button type="submit" class="goodfont boton" margin-bottom expand="block" >{{title}}</ion-button>
+            <br/><br>
+        </form>
+
+    </div>
+    <div *ngIf="title=='Calendar'" style="text-align: center; padding: 10px; width: 100%;">
+
+        <div class="form" style="text-align: center; cursor: pointer;">
+   
+            <div text-center>
+              <img *ngIf="mode == 'AGENT'" text-center class="circle" [src]="calendar_data.enduser_profile_pic" alt="">
+              <img *ngIf="mode == 'ENDUSER'" text-center class="circle" [src]="calendar_data.agent_profile_pic" alt="">
+            </div>
+        
+            <h3 *ngIf="mode == 'AGENT'" text-center> {{calendar_data.enduser_name}}</h3>
+            <h3 *ngIf="mode == 'ENDUSER'" text-center> {{calendar_data.agent_name}}</h3>
+            <p *ngIf="mode == 'AGENT'" text-center> User</p>
+            <p *ngIf="mode == 'ENDUSER'" text-center> Agent</p>
+            <br><br>
+            
+            <br>
+          
+            <ion-list padding style="margin-right: 4px;">
+        
+                <ion-item *ngIf="mode=='AGENT'">
+                    Ratings: {{ratings(calendar_data.enduser_ratings)}}% from {{ calendar_data.enduser_ratings.total_number }} agents that have rated  
+                </ion-item>
+                <ion-item *ngIf="mode == 'ENDUSER'">
+                    Ratings: {{ratings(calendar_data.agent_ratings)}}% from {{ calendar_data.agent_ratings.total_number }} users that have rated
+                </ion-item>
+                <ion-item>
+                    Status: {{ calendar_data.enquiry_status }}    
+                </ion-item>
+                <ion-item *ngIf="mode == 'ENDUSER'">
+                    Call out fee: {{ calendar_data.callout_fee }}
+                </ion-item>
+                <ion-item >
+                    From: {{ utils.format_date(calendar_data.starttime) }}   
+                </ion-item>
+                <ion-item>
+                    To: {{ utils.format_date(calendar_data.endtime) }}         
+                </ion-item>
+                <ion-item *ngIf="calendar_data.enquiry_status == 'Resolved'" style="color: green; cursor: pointer" (click)="rate(calendar_data.enquiry_id)">
+                    <ion-icon color="success" slot="start" name="star-outline"></ion-icon>
+                    <span *ngIf="mode=='ENDUSER'">Rate the agent based on their service</span> 
+                    <span *ngIf="mode=='AGENT'">Rate the user based on their interaction</span>    
+                </ion-item>
+                
+            </ion-list> 
+              
+            <br>
+            <br>
+        </div>
+
+    </div>
+    <div *ngIf="title=='Refer'" style="text-align: center; padding: 10px; width: 100%;">
+
+        <form [formGroup]="referredForm" (ngSubmit)="refer()" novalidate style="padding: 20px;">
+            <ion-item>
+                <ion-label style="font-weight: bold">Images of referal</ion-label>
+            </ion-item>
+
+            <ion-row>
+                
+                <ion-col size="6" (click)="capture('1')">
+                <ion-card style="height: unset">
+                    <ion-card-content *ngIf="utils.platformIs == 'mobile'" style="text-align: center; background-color: whitesmoke; max-height: 150px; min-height: 150px;">
+                    <img [src]="event.photo_1" style="width: 100px; height: 100px; margin: auto;">
+                    </ion-card-content>
+                    <ion-card-content *ngIf="utils.platformIs != 'mobile'" style="text-align: center; background-color: whitesmoke; height: 300px">
+                    <img [src]="event.photo_1" style="width: 200px; margin: auto;">
+                    </ion-card-content>
+                </ion-card>
+                </ion-col>
+
+                <ion-col size="6" (click)="capture('2')">
+                <ion-card style="height: unset">
+                    <ion-card-content *ngIf="utils.platformIs == 'mobile'" style="text-align: center; background-color: whitesmoke; max-height: 150px; min-height: 150px;">
+                    <img [src]="event.photo_2" style="width: 100px; height: 100px; margin: auto;">
+                    </ion-card-content>
+                    <ion-card-content *ngIf="utils.platformIs != 'mobile'" style="text-align: center; background-color: whitesmoke; height: 300px">
+                    <img [src]="event.photo_2" style="width: 200px; margin: auto;">
+                    </ion-card-content>
+                </ion-card>
+                </ion-col>
+                
+                <ion-col size="6" (click)="capture('3')">
+                <ion-card style="height: unset">
+                    <ion-card-content *ngIf="utils.platformIs == 'mobile'" style="text-align: center; background-color: whitesmoke; max-height: 150px; min-height: 150px;">
+                    <img [src]="event.photo_3" style="width: 100px; height: 100px; margin: auto;">
+                    </ion-card-content>
+                    <ion-card-content *ngIf="utils.platformIs != 'mobile'" style="text-align: center; background-color: whitesmoke; height: 300px">
+                    <img [src]="event.photo_3" style="width: 200px; margin: auto;">
+                    </ion-card-content>
+                </ion-card>
+                </ion-col>
+
+                <ion-col size="6" (click)="capture('4')">
+                <ion-card style="height: unset">
+                    <ion-card-content *ngIf="utils.platformIs == 'mobile'" style="text-align: center; background-color: whitesmoke; max-height: 150px; min-height: 150px;">
+                    <img [src]="event.photo_4" style="width: 100px; height: 100px; margin: auto;">
+                    </ion-card-content>
+                    <ion-card-content *ngIf="utils.platformIs != 'mobile'" style="text-align: center; background-color: whitesmoke; height: 300px">
+                    <img [src]="event.photo_4" style="width: 200px; margin: auto;">
+                    </ion-card-content>
+                </ion-card>
+                </ion-col>
+            
+            </ion-row>
+            <br/>
+  
+              <ion-item>
+                <ion-label style="font-weight: bold">
+                  How severe is the damage? *
+                </ion-label>
+              </ion-item>
+              <ion-item style="margin-left: 15px;">
+                <ion-label>
+                  Severe
+                </ion-label>
+                <ion-select interface="popover" #b (keyup.enter)="moveFocus(c)" formControlName="severity" >
+                  <ion-select-option required *ngFor="let severe of severity" value="{{severe}}">
+                    {{severe}}
+                  </ion-select-option>
+                </ion-select>
+              </ion-item>
+              <span class="error ion-padding" style="color: red; margin-left: 15px;" *ngIf="isSubmitted && errorControl.severity.errors?.required">
+                Severity required.
+              </span>
+              <br/>
+  
+              <ion-item>
+                <ion-label style="font-weight: bold">
+                  Where is the fault positioned? *
+                </ion-label>
+              </ion-item>
+              <ion-item style="margin-left: 15px;">
+                <ion-label>
+                  Position
+                </ion-label>
+                <ion-select interface="popover" #c (keyup.enter)="moveFocus(d)" formControlName="position" >
+                  <ion-select-option required *ngFor="let position of positions" value="{{position}}">
+                    {{position}}
+                  </ion-select-option>
+                </ion-select>
+              </ion-item>
+              <span class="error ion-padding" style="color: red; margin-left: 15px;" *ngIf="isSubmitted && errorControl.position.errors?.required">
+                Position required.
+              </span>
+              <br/>
+  
+              <ion-item>
+                <ion-label style="font-weight: bold">
+                  Type of area *
+                </ion-label>
+              </ion-item>
+              <ion-item style="margin-left: 15px;">
+                <ion-label>
+                  Area
+                </ion-label>
+                <ion-select interface="popover" #d (keyup.enter)="moveFocus(e)" formControlName="area" >
+                  <ion-select-option required *ngFor="let area of areas" value="{{area}}">
+                    {{area}}
+                  </ion-select-option>
+                </ion-select>
+              </ion-item>
+              <span class="error ion-padding" style="color: red; margin-left: 15px;" *ngIf="isSubmitted && errorControl.area.errors?.required">
+                Area required.
+              </span>
+              <br/>
+  
+              <ion-item>
+                <ion-label style="font-weight: bold">Describe the problem</ion-label>
+              </ion-item>
+              <ion-item style="margin-left: 15px;">
+                <ion-textarea placeholder="Please tell us more" #e (keyup.enter)="moveFocus(f)" formControlName="details" rows="3"></ion-textarea>
+              </ion-item>
+              <br/>
+
+            <ion-item>
+                <ion-label style="font-weight: bold">
+                  Who to refer to?*
+                </ion-label>
+            </ion-item>
+            <ion-item style="width: 100%; padding: 15px;">
+                <ion-label>Options</ion-label>
+                <ion-select #f (keyup.enter)="refer()" class="custom-options" interface="action-sheet" formControlName="skill">
+                    <ion-select-option required *ngFor="let skill of list_of_skills" value="{{skill.id}}">
+                        {{skill.title}}
+                    </ion-select-option>
+                </ion-select>
+            </ion-item>
+            <br/><br>
+            
+            <ion-button type="submit" class="goodfont boton" margin-bottom  expand="block" >{{title}}</ion-button>
+            
+        </form>
+
+    </div>
+  
+</ion-content>

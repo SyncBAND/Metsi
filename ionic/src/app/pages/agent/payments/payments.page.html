@@ -1,0 +1,63 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Invoices</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+
+  <div *ngIf="invoices.length == 0" style="text-align: center; margin-top: 50px">
+    There are no invoices as yet...
+  </div>
+
+  <ion-item *ngFor="let invoice of invoices">
+    <ion-card>
+      
+      <ion-item>
+        <ion-label>
+          <h3>{{invoice.name}}</h3>
+          <h6>{{invoice.suburb}}, {{invoice.city}}, {{invoice.country}}</h6>
+        </ion-label>
+      </ion-item>
+      <ion-slides *ngIf="invoice.images.length > 0" style="height: 300px" [options]="slideOptsOne" #slideWithNav  (ionSlideDidChange)="SlideDidChange(sliderOne,slideWithNav)">
+        <ion-slide *ngFor="let img of invoice.images">
+            <img [src]="img">
+        </ion-slide>
+      </ion-slides>
+
+      <ion-card-header>
+        <ion-card-subtitle>Problem: {{invoice.problem}}</ion-card-subtitle>
+      </ion-card-header>
+      <ion-card-content>
+        <p>Modified: {{invoice.modified}}</p>
+        <p>Created: {{invoice.created}}</p>
+        <br/>
+        {{invoice.description}}
+        <br/>
+        <br/>
+        <p>Status: {{invoice.current_status}}</p>
+      </ion-card-content>
+
+      <ion-footer>
+        <ion-row>
+          <ion-col style="text-align:right">
+            <ion-button horizontal="end" fill="clear" size="small" (click)="reserve(invoice.id)">
+              Reserve
+            </ion-button>
+          </ion-col>
+        </ion-row>
+      </ion-footer>
+
+    </ion-card>
+  </ion-item>
+
+  <ion-infinite-scroll (ionInfinite)="doInfinite($event)"  [disabled]="num_pages < page_number">
+    <ion-infinite-scroll-content loadingSpinner="bubbles" loadingText="Loading more data...">
+    </ion-infinite-scroll-content>
+  </ion-infinite-scroll>
+
+  <ion-list padding *ngIf="!authService.isLoggedIn">
+    <app-login-or-register></app-login-or-register>
+  </ion-list>
+  
+</ion-content>

@@ -1,0 +1,47 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>My work</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+
+  <ion-list padding *ngIf="!authService.isLoggedIn">
+
+    <app-login-or-register></app-login-or-register>
+    
+  </ion-list>
+
+  <div padding *ngIf="authService.isLoggedIn">
+
+    <div *ngFor="let stat of stats">
+
+      <br/>
+      
+      <!-- <ion-card style="cursor: pointer;" (click)="view(stat.name)"> -->
+      <ion-card style="cursor: pointer;" routerLink="/{{stat.name.toLowerCase()}}" routerDirection="root">
+        <ion-card-header>
+          <ion-card-subtitle></ion-card-subtitle>
+        </ion-card-header>
+        <ion-card-content style="text-align: center;">
+          <h3 style="font-size: 25px; color: black">{{ stat.value }}</h3>
+        </ion-card-content>
+
+        <ion-footer>
+          <ion-row>
+            <ion-col style="text-align:center">
+              <ion-button horizontal="end" fill="clear" size="small" color="primary">
+                View {{ stat.name }}
+              </ion-button>
+            </ion-col>
+          </ion-row>
+        </ion-footer>
+      </ion-card>
+
+      <br/>
+
+    </div>
+
+  </div>
+   
+</ion-content>

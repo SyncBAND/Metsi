@@ -1,0 +1,58 @@
+# http://opensource.newfies-dialer.org/en/latest/celery/celery-configuration.html
+CELERYD_NODES="worker1 worker2 worker3"
+
+# Where to chdir at start.
+CELERYD_CHDIR="/home/metsi/Env/app"
+
+# Python interpreter from environment.
+#ENV_PYTHON="$CELERYD_CHDIR/env/bin/python"
+ENV_PYTHON="$CELERYD_CHDIR/bin/python"
+
+# How to call "manage.py celeryd_multi"
+# CELERYD_MULTI="$ENV_PYTHON $CELERYD_CHDIR/metsi/manage.py celeryd_multi"
+
+# How to call "manage.py celeryctl"
+# CELERYCTL="$ENV_PYTHON $CELERYD_CHDIR/metsi/manage.py celeryctl"
+CELERY_BIN="/home/metsi/Env/app/bin/celery"
+# Extra arguments to celeryd
+# Longest task: 10 hrs (as of writing this, the UpdateQuanitites task takes 5.5 hrs)
+CELERYD_OPTS="-Q:worker1 celery -Q:worker2 on_request -Q:worker3 long_request"
+
+# Name of the celery config module.
+CELERY_CONFIG_MODULE="celeryconfig"
+
+# %n will be replaced with the nodename.
+CELERYD_LOG_FILE="/var/log/celery/%n.log"
+CELERYD_PID_FILE="/var/run/celery/%n.pid"
+
+# Name of the projects settings module.
+export DJANGO_SETTINGS_MODULE="vandm.settings"
+
+# Workers should run as an unprivileged user.
+#   You need to create this user manually (or you can choose
+#   a user/group combination that already exists, e.g. nobody).
+CELERYD_USER="celery"
+CELERYD_GROUP="celery"
+
+# If enabled pid and log directories will be created if missing,
+# and owned by the userid/group configured.
+CELERY_CREATE_DIRS=1
+
+# Where to chdir at start.
+CELERYBEAT_CHDIR="$CELERYD_CHDIR"
+
+# Path to celerybeat
+CELERYBEAT="$ENV_PYTHON $CELERYBEAT_CHDIR/manage.py celerybeat"
+
+# Extra arguments to celerybeat.  This is a file that will get
+# created for scheduled tasks.  It's generated automatically
+# when Celerybeat starts.
+# CELERYBEAT_OPTS="--schedule=/var/run/celerybeat-schedule"
+CELERYBEAT_OPTS="--scheduler django_celery_beat.schedulers:DatabaseScheduler"
+
+# Log level. Can be one of DEBUG, INFO, WARNING, ERROR or CRITICAL.
+CELERYBEAT_LOG_LEVEL="INFO"
+
+# Log file locations
+CELERYBEAT_LOGFILE="/var/log/celerybeat.log"
+CELERYBEAT_PIDFILE="/var/run/celerybeat.pid"

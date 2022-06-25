@@ -1,0 +1,109 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Support</ion-title>
+    <ion-buttons slot="start">
+      <ion-button horizontal="end" fill="clear" size="small" (click)="back()">
+        <ion-icon slot="end" name="arrow-back-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content padding>
+ 
+  <ion-card>
+    
+      <form [formGroup]="supportForm" (ngSubmit)="sendSupport()" novalidate style="padding: 20px;">
+    
+          <ion-list padding>
+            
+            <ion-item>
+              <ion-input type="text" placeholder="Title" #a (keyup.enter)="moveFocus(b)" formControlName="title"></ion-input>
+            </ion-item>
+            <span class="error ion-padding" style="color: red;" *ngIf="isSubmitted && errorControl.title.errors?.required">
+              Title required.
+            </span>
+            <br/>
+
+            <ion-item>
+              <ion-label>Problem*</ion-label>
+              <ion-select interface="popover" #b (keyup.enter)="moveFocus(c)" formControlName="problem" >
+                <ion-select-option required *ngFor="let problem of list" value="{{problem}}">
+                  {{problem}}
+                </ion-select-option>
+              </ion-select>
+            </ion-item>
+            <span class="error ion-padding" style="color: red" *ngIf="isSubmitted && errorControl.problem.errors?.required">
+              Type of mechanic required.
+            </span>
+            <br/>
+
+            <ion-item>
+              <ion-textarea placeholder="Describe the issue (optional)" #c (keyup.enter)="moveFocus(d)" formControlName="description" rows="3"></ion-textarea>
+            </ion-item>
+            <br/>
+
+            <ion-item>
+              <ion-label>Images (optional)</ion-label>
+            </ion-item>
+
+              <ion-row>
+                
+                <ion-col size="6" (click)="capture('1')">
+                  <ion-card style="height: unset">
+                    <ion-card-content *ngIf="utils.platformIs == 'mobile'" style="text-align: center; background-color: whitesmoke; max-height: 150px; min-height: 150px;">
+                      <img [src]="event.photo_1" style="width: 100px; height: 100px; margin: auto;">
+                    </ion-card-content>
+                    <ion-card-content *ngIf="utils.platformIs != 'mobile'" style="text-align: center; background-color: whitesmoke; height: 300px">
+                      <img [src]="event.photo_1" style="width: 200px; margin: auto;">
+                    </ion-card-content>
+                  </ion-card>
+                </ion-col>
+
+                <ion-col size="6" (click)="capture('2')">
+                  <ion-card style="height: unset">
+                    <ion-card-content *ngIf="utils.platformIs == 'mobile'" style="text-align: center; background-color: whitesmoke; max-height: 150px; min-height: 150px;">
+                      <img [src]="event.photo_2" style="width: 100px; height: 100px; margin: auto;">
+                    </ion-card-content>
+                    <ion-card-content *ngIf="utils.platformIs != 'mobile'" style="text-align: center; background-color: whitesmoke; height: 300px">
+                      <img [src]="event.photo_2" style="width: 200px; margin: auto;">
+                    </ion-card-content>
+                  </ion-card>
+                </ion-col>
+                
+                <ion-col size="6" (click)="capture('3')">
+                  <ion-card style="height: unset">
+                    <ion-card-content *ngIf="utils.platformIs == 'mobile'" style="text-align: center; background-color: whitesmoke; max-height: 150px; min-height: 150px;">
+                      <img [src]="event.photo_3" style="width: 100px; height: 100px; margin: auto;">
+                    </ion-card-content>
+                    <ion-card-content *ngIf="utils.platformIs != 'mobile'" style="text-align: center; background-color: whitesmoke; height: 300px">
+                      <img [src]="event.photo_3" style="width: 200px; margin: auto;">
+                    </ion-card-content>
+                  </ion-card>
+                </ion-col>
+
+                <ion-col size="6" (click)="capture('4')">
+                  <ion-card style="height: unset">
+                    <ion-card-content *ngIf="utils.platformIs == 'mobile'" style="text-align: center; background-color: whitesmoke; max-height: 150px; min-height: 150px;">
+                      <img [src]="event.photo_4" style="width: 100px; height: 100px; margin: auto;">
+                    </ion-card-content>
+                    <ion-card-content *ngIf="utils.platformIs != 'mobile'" style="text-align: center; background-color: whitesmoke; height: 300px">
+                      <img [src]="event.photo_4" style="width: 200px; margin: auto;">
+                    </ion-card-content>
+                  </ion-card>
+                </ion-col>
+            
+              </ion-row>
+            <br/>
+
+            <div style="text-align: center">
+              <ion-button [color]="primary" type="submit"> Send </ion-button>
+            </div>
+          
+          </ion-list>
+
+      </form>
+  </ion-card>
+ 
+</ion-content>
+

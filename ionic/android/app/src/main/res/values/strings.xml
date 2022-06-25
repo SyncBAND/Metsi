@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Metsi</string>
+    <string name="title_activity_main">Metsi</string>
+    <string name="package_name">co.za.metsi.app</string>
+    <string name="custom_url_scheme">co.za.metsi.app</string>
+</resources>

@@ -1,0 +1,87 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Interests</ion-title>
+    <ion-buttons slot="start">
+      <ion-button horizontal="end" fill="clear" size="small" (click)="back()">
+        <ion-icon slot="end" name="arrow-back-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+
+  <ion-list padding *ngIf="!authService.isLoggedIn">
+    <app-login-or-register></app-login-or-register>
+  </ion-list>
+
+  <div padding *ngIf="authService.isLoggedIn">
+
+    <div *ngIf="interests.length == 0" style="text-align: center; margin-top: 50px">
+      There are no interests as yet...
+    </div>
+
+    <ion-item *ngFor="let entry of interests">
+      <ion-card style="width: 100%;">
+        
+        <ion-item>
+          <ion-avatar slot="start" style="border: 1px solid lightgray; padding: 2px;">
+            <img *ngIf="mode=='AGENT'" [src]="entry.enduser_profile_pic">
+            <img *ngIf="mode=='ENDUSER'" [src]="entry.agent_profile_pic">
+          </ion-avatar>
+          <ion-label>
+            <h3 *ngIf="mode=='AGENT'">{{entry.enduser_name}}</h3>
+            <h3 *ngIf="mode=='ENDUSER'">{{entry.agent_name}}</h3>
+          </ion-label>
+        </ion-item>
+
+        <ion-card-header>
+          <ion-card-subtitle *ngIf="entry.current_status == 'Pending'" style="color: blue;">Status: {{entry.current_status}}</ion-card-subtitle>
+          <ion-card-subtitle *ngIf="entry.current_status == 'Declined'" style="color: red;">Status: {{entry.current_status}}</ion-card-subtitle>
+          <ion-card-subtitle *ngIf="entry.current_status == 'Approved'" style="color: green;">Status: {{entry.current_status}}</ion-card-subtitle>
+        </ion-card-header>
+        <ion-card-content>
+          Please confirm the times and callout fee before approving
+          <p style="font-weight: bold;">From: {{ utils.format_date(entry.starttime) }}</p>
+          <p style="font-weight: bold;">To: {{ utils.format_date(entry.endtime) }}</p>
+          <br/>
+          {{entry.message}}
+          <br/>
+          <p *ngIf="mode=='AGENT'">Ratings: User has {{rating(entry.enduser_ratings)}}% from {{ entry.enduser_ratings.total_number }} people that have rated</p>
+          <p *ngIf="mode=='ENDUSER'">Ratings: Agent has {{rating(entry.agent_ratings)}}% from {{ entry.agent_ratings.total_number }} people that have rated</p>
+          <br/>
+          <p *ngIf="mode=='ENDUSER'" style="font-weight: bold;">Agent callout fee: R {{ entry.callout_fee }}</p>
+          <br/>
+          <p>Created: {{ utils.format_date(entry.created) }}</p>
+          <p>Status details: {{ entry.status_details }}</p>
+        </ion-card-content>
+
+        <ion-footer *ngIf="entry.current_status == 'Pending' && mode=='ENDUSER'">
+          
+          <ion-row>
+            <ion-col style="text-align:left">
+              <ion-button horizontal="end" fill="clear" size="small" color="danger" (click)="decline(entry.id, entry.enquiry_id)">
+                Decline
+              </ion-button>
+            </ion-col>
+
+            <ion-col style="text-align:right">
+              <ion-button horizontal="end" fill="clear" size="small" color="primary" (click)="approve(entry.id, entry.enquiry_id)">
+                Approve
+              </ion-button>
+            </ion-col>
+          </ion-row>
+
+        </ion-footer>
+
+      </ion-card>
+    </ion-item>
+
+    <ion-infinite-scroll (ionInfinite)="doInfinite($event)"  [disabled]="num_pages < page_number">
+      <ion-infinite-scroll-content loadingSpinner="bubbles" loadingText="Loading more data...">
+      </ion-infinite-scroll-content>
+    </ion-infinite-scroll>
+
+  </div>
+  
+</ion-content>

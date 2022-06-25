@@ -1,0 +1,57 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Enduser</ion-title>
+
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/home"></ion-back-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-grid>
+    <ion-row>
+
+      <ion-col size="12" style="text-align: center; margin-top: 150px; padding: 15px;">
+        <p>How will you be paying for your accomodation?</p>
+      </ion-col>
+
+      <ion-col size="12" style="text-align: center; padding: 15px; padding-bottom: 30px;">
+        <ion-icon name="school-outline" style="width: 100%; height: 50px;padding-top: 15px;"></ion-icon>
+      </ion-col>
+
+      <ion-col size="4">
+
+        <ion-card style="cursor: pointer" (click)="set_mode('cash')">
+          <ion-icon name="wallet-outline" style="width: 100%; height: 50px;padding-top: 15px;"></ion-icon>
+          <ion-footer style="text-align: center;">
+            <h5 style="text-transform: uppercase;font-size: 14px;padding-top: 10px;">Cash</h5>
+          </ion-footer>
+        </ion-card>
+
+      </ion-col>
+      <ion-col size="4">
+
+        <ion-card style="cursor: pointer" (click)="set_mode('nasfas')">
+          <ion-icon name="reader-outline" style="width: 100%; height: 50px;padding-top: 15px;"></ion-icon>
+          <ion-footer style="text-align: center;">
+            <h5 style="text-transform: uppercase;font-size: 14px;padding-top: 10px;">NASFAS</h5>
+          </ion-footer>
+        </ion-card>
+
+      </ion-col>
+      <ion-col size="4">
+
+        <ion-card style="cursor: pointer" (click)="set_mode('bursary')">
+          <ion-icon name="ribbon-outline" style="width: 100%; height: 50px;padding-top: 15px;"></ion-icon>
+          <ion-footer style="text-align: center;">
+            <h5 style="text-transform: uppercase;font-size: 14px;padding-top: 10px;">Bursary</h5>
+          </ion-footer>
+        </ion-card>
+
+      </ion-col>
+
+    </ion-row>
+
+  </ion-grid>
+</ion-content>

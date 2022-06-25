@@ -1,0 +1,103 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Search</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <span style="position: fixed; width: 100%; z-index: 5; background: white;">
+    <ion-item>
+      <ion-label>
+        <span style="float: left; margin-top: 9px;">
+          Distance from you: {{distance}}km
+        </span>
+        <span style="float: right;">
+          <ion-button (click)="getLocation()">
+            Refresh
+          </ion-button>
+        </span>
+      </ion-label>
+    </ion-item>
+    <ion-item>
+      <ion-range debounce="700" (ionChange)="search($event)" [(ngModel)]="distance" min="2" max="100" pin color="secondary">
+        <ion-label range-left>2</ion-label>
+        <ion-label range-right>100</ion-label>
+      </ion-range>
+    </ion-item>
+  </span>
+
+  <div *ngIf="enquiries.length == 0" style="text-align: center; margin-top: 170px">
+    There are no jobs as yet...
+  </div>
+
+  <div *ngIf="enquiries.length > 0"  style="margin-top: 150px">
+    <ion-item *ngFor="let enquiry of enquiries">
+      
+        <ion-card style="width: 100%;">
+          
+          <ion-item>
+            <ion-label>
+              <h3>{{enquiry.name}}</h3>
+              <h6>{{enquiry.suburb}}, {{enquiry.city}}, {{enquiry.country}}</h6>
+              <h6>approx {{enquiry.distance.toFixed(2)}}km away</h6>
+            </ion-label>
+          </ion-item>
+          <ion-slides *ngIf="enquiry.images.length > 0" style="height: 300px" [options]="slideOptsOne" #slideWithNav  (ionSlideDidChange)="SlideDidChange(sliderOne,slideWithNav)">
+            <ion-slide *ngFor="let img of enquiry.images">
+                <img [src]="img">
+            </ion-slide>
+          </ion-slides>
+
+          <ion-card-header>
+            <ion-card-subtitle>Problem: {{enquiry.problem}}</ion-card-subtitle>
+          </ion-card-header>
+          <ion-card-content>
+
+            <p>Position: {{ enquiry.position }}</p>
+            <p>Area: {{ enquiry.area }}</p>
+
+            <br/>
+            {{enquiry.description}}
+            <span *ngIf="enquiry.description.trim().length > 0">
+              <br/>
+              <br/>
+            </span>
+            <span *ngIf="enquiry.status_details!= null && enquiry.status_details.trim().length > 0">
+            Status details: {{enquiry.status_details}}
+            <p>Updated: {{ utils.format_date(enquiry.modified) }}</p>
+              <br/>
+            </span>
+            <p>Type: {{enquiry.skill}}</p>
+            <p>Status: {{enquiry.current_status}}</p>
+            <p>Severity: {{ enquiry.severity }}</p>
+            <p>Created: {{ utils.format_date(enquiry.created) }}</p>
+            
+          </ion-card-content>
+
+          <ion-footer *ngIf="!enquiry.interest">
+            <ion-row>
+
+              <ion-col style="text-align:right">
+                <ion-button horizontal="end" fill="clear" size="small" (click)="reserve(enquiry.id)">
+                  Reserve
+                </ion-button> 
+              </ion-col>
+
+            </ion-row>
+          </ion-footer>
+
+        </ion-card>
+
+    </ion-item>
+  </div>
+
+  <ion-infinite-scroll (ionInfinite)="doInfinite($event)"  [disabled]="num_pages < page_number">
+    <ion-infinite-scroll-content loadingSpinner="bubbles" loadingText="Loading more data...">
+    </ion-infinite-scroll-content>
+  </ion-infinite-scroll>
+
+  <ion-list padding *ngIf="!authService.isLoggedIn">
+    <app-login-or-register></app-login-or-register>
+  </ion-list>
+  
+</ion-content>

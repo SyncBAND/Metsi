@@ -1,0 +1,54 @@
+<ion-content [fullscreen]="true" class="ion-padding">
+
+  <ion-grid>
+    <ion-row>
+      <ion-col size="12">
+
+        <ion-slides pager="true" [options]="slideOpts" #slideWithNav
+          (ionSlideDidChange)="SlideDidChange(modeSlider,slideWithNav)">
+          <ion-slide style="height: 250px;" *ngFor="let s of modeSlider.slidesItems">
+            <img src="../../../../assets/logo.png">
+          </ion-slide>
+        </ion-slides>
+
+      </ion-col>
+
+      <ion-col size="12" style="text-align: center; margin-top: 10px;">
+        <h4>Metsi</h4>
+        <br/>
+        <p>Select an option below</p>
+      </ion-col>
+
+      <ion-col size="2">
+      </ion-col>
+      <ion-col size="4">
+
+        <ion-card style="cursor: pointer" (click)="set_mode()">
+          <ion-icon name="accessibility-outline" style="width: 100%; height: 50px;padding-top: 15px;"></ion-icon>
+          <ion-footer style="text-align: center;">
+            <h5 style="text-transform: uppercase;font-size: 12px;padding-top: 10px;">Enduser</h5>
+          </ion-footer>
+        </ion-card>
+
+      </ion-col>
+      <ion-col size="4">
+
+        <ion-card style="cursor: pointer" routerLink="/agent">
+          <ion-icon name="construct-outline" style="width: 100%; height: 50px;padding-top: 15px;"></ion-icon>
+          <ion-footer style="text-align: center;">
+            <h5 style="text-transform: uppercase;font-size: 12px;padding-top: 10px;">Agent</h5>
+          </ion-footer>
+        </ion-card>
+
+      </ion-col>
+      <ion-col size="2">
+      </ion-col>
+
+      <ion-col size="12">
+        <p style="margin-top:10px; font-size: 12px; text-align: center; color: #8c8b8b; padding-left: 15px; padding-right: 15px"><span>By continuing, you are agreeing to our <span style="color:#0496da; cursor: pointer;" (click)="terms()">Terms of Service</span> and <span style="color:#0496da; cursor: pointer;" (click)="policy()">Privacy Policy</span></span></p>
+      </ion-col>
+
+    </ion-row>
+  </ion-grid>
+
+</ion-content>

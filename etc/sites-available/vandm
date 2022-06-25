@@ -1,0 +1,27 @@
+upstream djang {
+    server 127.0.0.1:8001; # for a web port socket
+}
+server {
+    listen 80;
+    server_name www.getaccom.com getaccom.com 102.130.117.220;
+    
+    charset utf-8;
+
+    client_max_body_size 10M;
+
+    #Django media and static files
+    location /media/ {
+        autoindex on;
+        root /home/vandm/Env/vandm/vandm;
+    }
+
+    location /static/ {
+        root /home/vandm/Env/vandm/vandm;
+    }
+
+    #All the other stuff is handled by Django
+    location / {
+        uwsgi_pass djang;
+        include /home/vandm/Env/vandm/vandm/uwsgi_params; #the params file we installed
+    }
+}

@@ -1,0 +1,336 @@
+#ubuntu 20.04
+
+##################################
+########## vital setup ###########
+##################################
+
+#as root user
+adduser metsi
+cat /etc/passwd
+usermod -a -G sudo metsi
+groups username
+
+# change user
+su metsi
+cd ~
+
+#use sudo if you're logged in as username. leave out sudo if you're logged in as the root user
+sudo apt-get update
+sudo apt install postgis postgresql-12-postgis-3
+sudo apt-get install python3-pip python3-dev libpq-dev 
+sudo apt-get install binutils libproj-dev gdal-bin
+sudo apt-get install libgeos-dev nano nginx
+
+sudo -u postgres psql
+CREATE DATABASE metsi_db;
+CREATE USER metsi WITH PASSWORD 'Metsi201!';
+GRANT ALL PRIVILEGES ON DATABASE metsi_db TO metsi;
+\c metsi_db
+CREATE EXTENSION postgis;
+\q
+
+------ for mac --------
+Stop
+brew services stop postgresql
+
+Start
+brew services start postgresql
+
+psql postgres
+CREATE ROLE newuser WITH LOGIN PASSWORD 'password';
+ALTER ROLE newuser CREATEDB;
+CREATE DATABASE mydatabasename;
+DROP DATABASE mydatabasename;
+GRANT ALL PRIVILEGES ON DATABASE mydatabasename TO newuser;
+\c mydatabasename
+CREATE EXTENSION postgis;
+\q
+----- end for mac ------
+
+# django setup below reference --> https://www.digitalocean.com/community/tutorials/how-to-serve-django-applications-with-uwsgi-and-nginx-on-ubuntu-16-04
+
+pip3 install virtualenv virtualenvwrapper
+
+# note: from Ubuntu 16.04 and onward the location of vritualenvwrapper’s pip installation changed from /usr/local/bin/virtualenvwrapper.sh to ~/.local/bin/virtualenvwrapper.sh. Note that the local directory is hidden.
+sudo cp ~/.local/bin/virtualenvwrapper.sh /usr/bin/
+sudo cp ~/.local/bin/virtualenv /usr/bin/
+
+echo "export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3" >> ~/.bashrc
+echo "export WORKON_HOME=~/Env" >> ~/.bashrc
+echo "export VIRTUALENVWRAPPER_VIRTUALENV=/usr/bin/virtualenv" >> ~/.bashrc
+echo "source /home/metsi/.local/bin/virtualenvwrapper.sh" >> ~/.bashrc
+source ~/.bashrc
+
+mkvirtualenv metsi
+
+cd ~/Env/metsi
+# git reference https://docs.github.com/en/enterprise-server@3.2/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent
+ssh-keygen -t ed25519 -C "info@metsiapp.co.za"
+
+sudo apt-get install git
+git clone git@github.com:username/metsi.git
+
+cd metsi/metsi
+pip install -r requirements.txt
+
+# create and paste env variables
+nano .env
+
+python manage.py makemigrations
+python manage.py migrate
+python manage.py collectstatic
+mkdir -p ../static_in_env/media_root/company-logos/
+cp static_in_pro/our_static/dashboard/img/icons/shopping-cart.png ../static_in_env/media_root/company-logos/
+
+
+##################################
+####### end of vital setup #######
+##################################
+
+
+########################
+#### uwsgi setup #######
+########################
+sudo -H pip3 install uwsgi
+sudo mkdir -p /etc/uwsgi/sites
+sudo nano /etc/uwsgi/sites/metsi.ini
+
+# -------- save the following inside metsi.ini ------------ #
+[uwsgi]
+project = metsi       
+uid = metsi
+gid = metsi
+base = /home/%(uid)/Env/metsi
+
+#pidfile = /run/uwsgi/uwsgi.pid
+chdir = %(base)/%(project)
+module = vandm.wsgi
+home = %(base)
+
+master = true
+processes = 5
+
+socket = :8001
+chown-socket = %(gid):%(uid)
+chmod-socket = 660
+vacuum = true
+
+daemonize=/var/log/uwsgi/metsi.log
+# path to where uwsgi logs will be saved
+logto = /var/log/uwsgi/metsi.log
+
+# -------- end of metsi.ini ------------ #
+
+sudo nano /etc/systemd/system/uwsgi.service
+
+# -------- save the following inside uwsgi.service ------------ #
+[Unit]
+Description=uWSGI Emperor service
+
+[Service]
+ExecStartPre=/bin/bash -c 'mkdir -p /run/uwsgi; chown metsi:metsi /run/uwsgi'
+ExecStart=/home/metsi/Env/metsi/bin/uwsgi --emperor /etc/uwsgi/sites
+Restart=always
+KillSignal=SIGQUIT
+Type=notify
+NotifyAccess=all
+
+[Install]
+WantedBy=multi-user.target
+# -------- end of uwsgi.service ------------ #
+
+sudo mkdir /var/log/uwsgi/
+sudo touch /var/log/uwsgi/metsi.log
+sudo chown metsi:metsi /var/log/uwsgi/metsi.log
+
+##################################
+####### end of uwsgi setup #######
+##################################
+
+
+###########################
+### stop httpd - apache ###
+###########################
+
+sudo service apache2 stop
+sudo apt remove apache2
+sudo apt-get purge apache2 apache2-utils apache2-bin apache2.2-common
+
+###########################
+### end httpd - apache ####
+###########################
+
+#################################
+##### install letsencrypt #######
+#################################
+
+sudo apt install certbot python3-certbot-nginx
+sudo service nginx start
+
+sudo certbot --nginx -d metsiapp.co.za -d www.metsiapp.co.za
+
+# Verifying Certbot Auto-Renewal #
+sudo systemctl status certbot.timer
+
+#######################################
+####### end install letsencrypt #######
+#######################################
+
+####################################
+####### start of nginx setup #######
+####################################
+
+sudo nano /etc/nginx/sites-available/metsi.conf
+
+# -------- save the following inside metsi ------------ #
+upstream djang {
+    server 127.0.0.1:8001; # for a web port socket
+}
+#server redirect frop http to https
+server {
+    if ($host = www.metsiapp.co.za) {
+        return 301 https://$host$request_uri;
+    } # managed by Certbot
+
+    listen 80;
+    server_name www.metsiapp.co.za;
+    rewrite ^(.*) https://metsiapp.co.za$1 permanent;
+}
+server {
+
+    listen 443 ssl;
+    server_name www.metsiapp.co.za;
+    ssl_certificate /etc/letsencrypt/live/www.metsiapp.co.za/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/www.metsiapp.co.za/privkey.pem; # managed by Certbot
+    rewrite ^(.*) https://metsiapp.co.za$1 permanent;
+
+}
+server {
+    listen 443 ssl http2;
+    ssl_certificate /etc/letsencrypt/live/metsiapp.co.za/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/metsiapp.co.za/privkey.pem; # managed by Certbot
+
+    # SSL Configuration Start
+
+    ssl_stapling on;
+    ssl_stapling_verify on;
+    resolver 8.8.4.4 8.8.8.8 valid=300s;
+    resolver_timeout 10s;
+    ssl_session_cache    shared:SSL:10m;
+    ssl_session_timeout  10m;
+    ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
+    ssl_prefer_server_ciphers On;
+    ssl_ciphers ECDH+AESGCM:DH+AESGCM:ECDH+AES256:DH+AES256:ECDH+AES128:DH+AES:ECDH+3DES:DH+3DES:RSA+AESGCM:RSA+AES:RSA+3DES:!aNULL:!MD5:!DSS;
+
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+    ssl_buffer_size 8k;
+    add_header Strict-Transport-Security max-age=31536000;
+
+    server_name metsiapp.co.za 102.130.112.252;
+    
+    charset utf-8;
+
+    client_max_body_size 10M;
+
+    #Django media and static files
+    location /media/ {
+        autoindex on;
+        alias /home/metsi/Env/metsi/metsi/static_in_env/media_root/;
+    }
+
+    location ^/static {
+        alias /home/metsi/Env/metsi/metsi/static_in_env/static_root;
+    }
+
+    #All the other stuff is handled by Django
+    location / {
+        uwsgi_pass djang;
+        include /home/metsi/Env/metsi/metsi/uwsgi_params; #the params file we installed
+    }
+}
+
+# -------- end of metsi ------------ #
+
+sudo ln -s /etc/nginx/sites-available/metsi.conf /etc/nginx/sites-enabled
+sudo nginx -t
+
+##################################
+####### end of nginx setup #######
+##################################
+
+sudo service nginx restart
+sudo systemctl start uwsgi
+
+
+## install vsftpd for secure ftp access
+>##########################
+>######* sftp setup #######
+>##########################
+
+> Follow Step 1, Step 4 and Step 6 only  - https://www.digitalocean.com/community/tutorials/how-to-set-up-vsftpd-for-a-user-s-directory-on-ubuntu-20-04
+sudo apt-get install vsftpd
+sudo cp /etc/vsftpd.conf /etc/vsftpd.conf.orig
+sudo nano /etc/vsftpd.conf
+
+>##################################
+>#######* end of sftp setup #######
+>##################################
+
+
+## docker-ce and compose
+> https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-20-04
+> https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-compose-on-ubuntu-20-04
+newgrp docker
+
+#https://stackoverflow.com/questions/18643998/geodjango-geosexception-error
+ver = geos_version().decode().split(' ')[0]
+
+# This creates the server in a screen and then detaches it. This way you can simply go back in and type
+screen -d -m python manage.py runserver 0.0.0.0:8000
+
+#Celery
+sudo apt-get install rabbitmq-server
+sudo nano /etc/default/celeryd file saved in etc
+sudo sh -x /etc/init.d/celeryd start
+sudo rabbitmqctl list_queues
+https://kitcharoenp.github.io/celery/2019/03/11/celery_worker_as_daemon.html
+https://stackoverflow.com/questions/21880360/daemonizing-celery
+https://stackoverflow.com/questions/5463241/celery-run-different-workers-on-one-server
+https://gist.github.com/haridas/2928247
+
+
+#install vstpd and ftp django project folder in /home/metsi/Env/metsi/ 
+
+
+Android
+ionic capacitor build android
+npx cap sync
+in Androidmanifest.xml - under application
+android:usesCleartextTraffic = "true"
+android:networkSecurityConfig="@xml/network_security_config">
+<uses-library
+    android:name="org.apache.http.legacy"
+    android:required="false" />
+
+xml/network_security_config.xml
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+<domain-config cleartextTrafficPermitted="true">
+    <domain includeSubdomains="true">metsiapp.co.za</domain>
+    <domain includeSubdomains="true">metsiapp.co.za/api</domain>
+    <domain includeSubdomains="true">metsiapp.co.za:8001</domain>
+    <domain includeSubdomains="true">metsiapp.co.za:8001/api</domain>
+    <domain includeSubdomains="true">102.130.112.252</domain>
+    <domain includeSubdomains="true">102.130.112.252/api</domain>
+    <domain includeSubdomains="true">102.130.112.252:8001</domain>
+    <domain includeSubdomains="true">102.130.112.252:8001/api</domain>
+</domain-config>
+</network-security-config>
+
+
+https://stackoverflow.com/questions/51902629/how-to-allow-all-network-connection-types-http-and-https-in-android-9-pie
+
+#curl requests
+https://django-rest-framework-simplejwt.readthedocs.io/en/latest/getting_started.html#usage
+
+./manage.py dumpdata admin > admin.json

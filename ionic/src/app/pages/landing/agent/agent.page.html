@@ -1,0 +1,65 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Agent</ion-title>
+
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/home"></ion-back-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+
+  <ion-grid>
+    <ion-row>
+
+      <ion-col size="12" style="text-align: center; margin-top: 80px; padding: 15px;">
+        <p>Before we get you started, what type of service provider are you?</p>
+      </ion-col>
+      <br/>
+
+      <ion-col size="12" style="text-align: center; padding: 15px;">
+        <ion-icon name="construct-outline" style="width: 100%; height: 50px;padding-top: 15px;"></ion-icon>
+      </ion-col>
+      <br/>
+
+      <ion-item style="width: 100%; padding: 15px;">
+        <ion-label>Options</ion-label>
+        <ion-select class="custom-options" multiple="true" interface="action-sheet" [(ngModel)]="service" [value]="services != undefined ? services: []" (ngModelChange)="selected(service)" >
+          <ion-select-option required *ngFor="let service of list" value="{{service.id}}: {{service.title}}">
+            {{service.title}}
+          </ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <br/>
+      <br/>
+      <ion-col size="12" *ngIf="services.length > 0" style="width: 100%; text-align: left; padding: 20px;">
+
+        <ion-col size="12">
+          <ion-label>Services</ion-label>
+          <div *ngFor="let service of services">
+            <p style="width: 100%; padding: 10px;">
+              + {{service.split(': ')[1]}}
+            </p>
+          </div>
+        </ion-col>
+        
+        <ion-col size="4">
+        </ion-col>
+        <ion-col size="4">
+          <ion-card style="cursor: pointer" (click)="set_mode()">
+            <ion-icon name="checkmark-outline" style="width: 100%; height: 50px;padding-top: 15px;"></ion-icon>
+            <ion-footer style="text-align: center;">
+              <h5 style="text-transform: uppercase;font-size: 14px;padding-top: 10px;">Continue</h5>
+            </ion-footer>
+          </ion-card>
+        </ion-col>
+        <ion-col size="4">
+        </ion-col>
+
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+
+</ion-content>

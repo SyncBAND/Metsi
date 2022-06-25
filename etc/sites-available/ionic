@@ -1,0 +1,18 @@
+server {
+    listen 8100;
+    server_name 102.130.117.220;
+
+    charset utf-8;
+
+    client_max_body_size 10M;
+
+    #Django media and static files
+    location / {
+        proxy_pass http://127.0.0.1:8101;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection $http_connection;
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+    }
+}

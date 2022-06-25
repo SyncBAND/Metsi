@@ -1,0 +1,94 @@
+<ion-header *ngIf="authService.isLoggedIn" translucent no-border>
+  <ion-toolbar>
+    <ion-title>
+      &nbsp;
+    </ion-title>
+    <ion-buttons slot="end">
+      <ion-button routerLink="/edit-profile" routerDirection="root">
+
+        <ion-icon slot="icon-only" name="create"></ion-icon>
+        <!-- <ion-icon slot="icon-only" src="../../assets/checkmark-filled.svg"></ion-icon> -->
+
+       </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+ 
+  <div class="form" style="text-align: center;">
+   
+    <div text-center style="cursor: pointer;">
+      <img *ngIf="!authService.isLoggedIn" text-center class="circle" (click)="login_message()" src="{{photo}}" alt="">
+      <img *ngIf="authService.isLoggedIn" text-center class="circle" (click)="capture()" src="{{photo}}" alt="">
+    </div>
+
+    <h3 text-center> {{this.currentUser.first_name}}</h3>
+
+    <div text-center>
+      <br>
+      <p> You're currently in</p>
+        <ion-button (click)="change()" shape="round" color="light">
+          {{mode}} Mode
+        </ion-button>
+
+    </div>
+    <br><br>
+    
+    <br>
+  
+    <ion-list padding *ngIf="authService.isLoggedIn" style="margin-right: 4px;">
+      <!-- <ion-item>
+        <ion-icon slot="start" name="options-outline"></ion-icon>
+        Dark mode 
+        <ion-toggle  (ionChange)="update($event)" slot="end" color="primary"></ion-toggle>
+      </ion-item> -->
+
+      <ion-item *ngIf="activated" style="color: green; cursor: pointer" (click)="verify_or_update()">
+        <ion-icon color="success" slot="start" name="person-circle-outline"></ion-icon>
+            Email Activated      
+      </ion-item>
+      <ion-item *ngIf="activated == false" (click)="verify_or_update()" style="color: red; cursor: pointer">
+        <ion-icon color="danger" slot="start" name="person-circle-outline"></ion-icon>
+            Email Not Activated: Please check your emails or update here     
+      </ion-item>
+
+      <ion-item (click)="security()" style="cursor: pointer;">
+          <ion-icon slot="start" name="lock-closed-outline"></ion-icon>
+          Security      
+      </ion-item>
+
+      <ion-item (click)="change()" style="cursor: pointer;">
+          <ion-icon slot="start" name="options-outline"></ion-icon>
+            Change modes       
+      </ion-item>
+      
+      <ion-item (click)="logout()" style="cursor: pointer;">
+          <ion-icon color="primary" slot="start" name="log-out"></ion-icon>
+            Logout         
+      </ion-item>
+    </ion-list>
+    
+    
+    <ion-list padding *ngIf="!authService.isLoggedIn">
+      
+      <ion-item (click)="change()" style="cursor: pointer;">
+          <ion-icon slot="start" name="options-outline"></ion-icon>
+          Change modes       
+      </ion-item>
+
+    </ion-list>
+      
+    <ion-list padding *ngIf="!authService.isLoggedIn">
+      <app-login-or-register></app-login-or-register>
+    </ion-list>
+
+    <br>
+    <br>
+  </div>
+
+
+
+
+
+</ion-content>

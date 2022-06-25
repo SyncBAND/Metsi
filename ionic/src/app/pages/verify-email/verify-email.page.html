@@ -1,0 +1,47 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Update Email</ion-title>
+    <ion-buttons slot="start">
+      <ion-button horizontal="end" fill="clear" size="small" (click)="back()">
+        <ion-icon slot="end" name="arrow-back-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+
+    <ion-buttons slot="end">
+      <ion-button (click)="refresh()">
+        REFRESH
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content style="text-align: center; padding: 10px;">
+
+  <div>
+    <br/>
+    <b>Current verified email: <br/>{{email_verified}}</b>
+  </div>
+
+  <form [formGroup]="verifyForm" (ngSubmit)="verify()" novalidate style="padding: 50px;">
+
+    <ion-list margin-top margin-bottom>
+
+        <ion-list-header>
+          Enter email you want to verify below
+        </ion-list-header>
+        <ion-item>
+            <ion-input type="text" tabindex="20" (keyup.enter)="verify()" placeholder="Email" formControlName="email" type="email" required></ion-input>
+        </ion-item>
+        <span class="error ion-padding" style="color: red" *ngIf="isSubmitted && errorControl.email.errors?.required">
+          Email is required.
+        </span>
+
+    </ion-list>
+
+    <br>
+    <ion-button type="submit" class="goodfont boton" margin-bottom>Update or Verify email</ion-button>
+    <br/>
+
+  </form>
+
+</ion-content>

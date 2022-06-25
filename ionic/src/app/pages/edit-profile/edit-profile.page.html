@@ -1,0 +1,62 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Update Details</ion-title>
+    <ion-buttons slot="start">
+      <ion-button horizontal="end" fill="clear" size="small" (click)="back()">
+        <ion-icon slot="end" name="arrow-back-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content style="text-align: center; padding: 10px;">
+
+  <form [formGroup]="updateProfileForm" (ngSubmit)="edit()" novalidate style="padding: 50px;">
+
+    <ion-list margin-top margin-bottom>
+
+      <ion-item lines="full">
+          <ion-input formControlName="first_name" type="text" placeholder="Name" (keyup.enter)="moveFocus(b)" required></ion-input>
+      </ion-item>
+      <span class="error ion-padding" style="color: red" *ngIf="isSubmitted && errorControl.first_name.errors?.required">
+          Name is required.
+      </span>
+      <span class="error ion-padding" style="color: red" *ngIf="isSubmitted && errorControl.first_name.errors?.minlength">
+          Name should be min 2 chars long.
+      </span>
+      
+      <br>
+
+      <ion-item lines="full">
+          <ion-input formControlName="last_name" type="text" placeholder="Last name" #b (keyup.enter)="moveFocus(c)" required></ion-input>
+      </ion-item>
+      <span class="error ion-padding" style="color: red" *ngIf="isSubmitted && errorControl.last_name.errors?.required">
+          Last name is required.
+      </span>
+      <span class="error ion-padding" style="color: red" *ngIf="isSubmitted && errorControl.last_name.errors?.minlength">
+          Last name should be min 2 chars long.
+      </span>
+      
+      <br>
+            
+      <ion-item lines="full">
+          <ion-input maxlength="15" formControlName="cell" type="tel" placeholder="Mobile" #c (keyup.enter)="edit()" required></ion-input>
+      </ion-item>
+      <span class="error ion-padding" style="color: red" *ngIf="isSubmitted && errorControl.cell.errors?.required">
+          Mobile number is required.
+      </span>
+      <span class="error ion-padding" style="color: red" *ngIf="isSubmitted && errorControl.cell.errors?.pattern">
+          Only numerical values allowed.
+      </span>
+
+      <br/>
+
+    </ion-list>
+
+    <br>
+    <ion-button type="submit" class="goodfont boton" margin-bottom>Edit</ion-button>
+    <br/>
+
+  </form>
+
+</ion-content>

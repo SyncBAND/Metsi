@@ -1,0 +1,13 @@
+{
+  "name": "Metsi",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular","proxies": [
+    {
+      "path": "/",
+      "proxyUrl": "https://metsiapp.co.za",
+      "secure": false
+    }
+  ]
+}

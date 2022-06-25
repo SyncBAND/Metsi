@@ -1,0 +1,15 @@
+<div class="stopwatch pt-3">
+    <h1 text-center class="color-white font-lg">
+      {{time}}
+    </h1>
+  <ion-grid>
+    <ion-row text-center class="mt-5">
+      <ion-col class="col-12" *ngIf="!running && time == blankTime">
+        <button class="circle-button circle-button-bg font-md" ion-button (tap)="start()">{{ 'start' | translate }}</button>
+      </ion-col>
+      <ion-col class="col-12" *ngIf="running">
+        <button class="circle-button circle-button-bg circle-button-red font-md" ion-button (tap)="stop()">{{ 'stop' | translate }}</button>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</div>

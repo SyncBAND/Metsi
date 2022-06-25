@@ -1,0 +1,22 @@
+<ion-header>
+  <ion-toolbar *ngIf="show_auto">
+    <br/>
+    <ion-title>Enter address</ion-title>
+    <br/>
+    <ion-searchbar [(ngModel)]="autocomplete.query" [showCancelButton]="true" (ionInput)="updateSearch()" (ionCancel)="dismiss()"></ion-searchbar>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content *ngIf="show_auto">
+  <ion-list>
+    <ion-item *ngFor="let item of autocompleteItems" tappable   (click)="chooseItem(item)">
+      {{ item }}
+    </ion-item>
+  </ion-list>
+</ion-content>
+
+<ion-content *ngIf="!show_auto" style="padding: 20px; text-align: center;">
+  <p>
+      Getting address...
+  </p>
+</ion-content>

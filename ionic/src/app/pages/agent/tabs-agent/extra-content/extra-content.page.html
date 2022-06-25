@@ -1,0 +1,55 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Tutorial</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+
+  <div *ngIf="tutorials.length == 0" style="text-align: center; margin-top: 50px">
+    There are no tutorials as yet...
+  </div>
+
+  <ion-item *ngFor="let tutorial of tutorials">
+    <ion-card style="width: 100%">
+      
+      <ion-item>
+        <ion-label>
+          <h3>{{tutorial.title}}</h3>
+        </ion-label>
+      </ion-item>
+      <ion-slides *ngIf="tutorial.images.length > 0" style="height: 300px" [options]="slideOptsOne" #slideWithNav  (ionSlideDidChange)="SlideDidChange(sliderOne,slideWithNav)">
+        <ion-slide *ngFor="let img of tutorial.images">
+            <img [src]="img">
+        </ion-slide>
+      </ion-slides>
+
+      <ion-card-header *ngIf="tutorial.url">
+        <br/>
+        <ion-card-subtitle style="color: blue; cursor: pointer" *ngIf="authService.isLoggedIn" (click)="visit(tutorial.id, tutorial.url)">Click here to learn more here</ion-card-subtitle>
+        <ion-card-subtitle style="color: blue" *ngIf="!authService.isLoggedIn">Login to learn more</ion-card-subtitle>
+      </ion-card-header>
+      <ion-card-content>
+        <br/>
+        {{ tutorial.description }}
+      </ion-card-content>
+
+      <ion-footer>
+        <ion-row>
+          <ion-col style="text-align:right">
+            <ion-button horizontal="end" fill="clear" size="small" (click)="rate(tutorial.id)">
+              Rate
+            </ion-button>
+          </ion-col>
+        </ion-row>
+      </ion-footer>
+
+    </ion-card>
+  </ion-item>
+
+  <ion-infinite-scroll (ionInfinite)="doInfinite($event)"  [disabled]="num_pages < page_number">
+    <ion-infinite-scroll-content loadingSpinner="bubbles" loadingText="Loading more data...">
+    </ion-infinite-scroll-content>
+  </ion-infinite-scroll>
+  
+</ion-content>

@@ -1,0 +1,77 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Approved</ion-title>
+    <ion-buttons slot="start">
+      <ion-button horizontal="end" fill="clear" size="small" (click)="back()">
+        <ion-icon slot="end" name="arrow-back-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+
+<ion-content>
+  <div *ngIf="bookings.length == 0" style="text-align: center; margin-top: 50px">
+    No approved bookings as yet
+  </div>
+  
+  <ion-item *ngFor="let booking of bookings">
+
+    <ion-card style="width: 100%;">
+      <ion-item>
+        <ion-label>
+          <h3>Problem: {{booking.problem}}</h3>
+        </ion-label>
+      </ion-item>
+      <ion-slides *ngIf="booking.images.length > 0" style="height: 300px" [options]="slideOptsOne" #slideWithNav  (ionSlideDidChange)="SlideDidChange(sliderOne,slideWithNav)">
+        <ion-slide *ngFor="let img of booking.images">
+            <img [src]="img">
+        </ion-slide>
+      </ion-slides>
+      <ion-card-header>
+        <ion-card-subtitle>Location: {{booking.suburb}}, {{booking.city}}, {{booking.country}}</ion-card-subtitle>
+      </ion-card-header>
+      <ion-card-content>
+
+        {{booking.description}}
+        <span *ngIf="booking.description.trim().length > 0">
+          <br/>
+          <br/>
+        </span>
+        <p style="color: rgb(255, 115, 0);">Status: {{ booking.current_status }}</p>
+        <p>{{ booking.current_status }}: {{ utils.format_date(booking.modified) }}</p>
+        <br/>
+        <p>Severity: {{ booking.severity }}</p>
+        <p>Position: {{ booking.position }}</p>
+        <p>Area: {{ booking.area }}</p>
+        <p>Reference: {{ booking.ref }}</p>
+        <p>Type: {{ booking.skill }}</p>
+        <p>Created: {{ utils.format_date(booking.created) }}</p>
+      </ion-card-content>
+
+      <ion-footer>
+        <ion-row>
+          <!-- <ion-col style="text-align:left">
+            <ion-button horizontal="end" fill="clear" size="small" color="primary" (click)="calendar(booking.id)">
+              <ion-icon slot="start" name="calendar"></ion-icon>
+            </ion-button>
+          </ion-col> -->
+
+          <!-- <ion-col style="text-align:right">
+            <ion-button horizontal="end" fill="clear" size="small" color="primary" (click)="chat(booking.id)">
+              <ion-icon slot="end" name="mail"></ion-icon>
+            </ion-button>
+          </ion-col> -->
+
+        </ion-row>
+      </ion-footer>
+    </ion-card>
+
+  </ion-item>
+
+  <ion-infinite-scroll (ionInfinite)="doInfinite($event)"  [disabled]="num_pages < page_number">
+    <ion-infinite-scroll-content loadingSpinner="bubbles" loadingText="Loading more data...">
+    </ion-infinite-scroll-content>
+  </ion-infinite-scroll>
+
+</ion-content>

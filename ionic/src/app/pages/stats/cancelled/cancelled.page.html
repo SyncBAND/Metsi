@@ -1,0 +1,57 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Cancelled</ion-title>
+    <ion-buttons slot="start">
+      <ion-button horizontal="end" fill="clear" size="small" (click)="back()">
+        <ion-icon slot="end" name="arrow-back-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+
+<ion-content>
+  <div *ngIf="bookings.length == 0" style="text-align: center; margin-top: 50px">
+    No cancelled bookings as yet
+  </div>
+  
+  <ion-item *ngFor="let booking of bookings">
+
+    <ion-card style="width: 100%;">
+      <ion-item>
+        <ion-label>
+          <h3>Problem: {{booking.problem}}</h3>
+        </ion-label>
+      </ion-item>
+      <ion-slides *ngIf="booking.images.length > 0" style="height: 300px" [options]="slideOptsOne" #slideWithNav  (ionSlideDidChange)="SlideDidChange(sliderOne,slideWithNav)">
+        <ion-slide *ngFor="let img of booking.images">
+            <img [src]="img">
+        </ion-slide>
+      </ion-slides>
+      <ion-card-header>
+        <ion-card-subtitle>Location: {{booking.suburb}}, {{booking.city}}, {{booking.country}}</ion-card-subtitle>
+      </ion-card-header>
+      <ion-card-content>
+        {{booking.description}}
+        <span *ngIf="booking.description.trim().length > 0">
+          <br/>
+          <br/>
+        </span>
+        <p *ngIf="booking.severity">Severity: {{ booking.severity }}</p>
+        <p *ngIf="booking.ref">Reference: {{ booking.ref }}</p>
+        <p>Type: {{ booking.skill }}</p>
+        <p>Created: {{ utils.format_date(booking.enquiry_created) }}</p>
+        <br/>
+        <p style="color: red">Cancelled on: {{ utils.format_date(booking.modified) }}</p>
+        <p>Reason: {{ booking.status_details }}</p>
+      </ion-card-content>
+    </ion-card>
+
+  </ion-item>
+
+  <ion-infinite-scroll (ionInfinite)="doInfinite($event)"  [disabled]="num_pages < page_number">
+    <ion-infinite-scroll-content loadingSpinner="bubbles" loadingText="Loading more data...">
+    </ion-infinite-scroll-content>
+  </ion-infinite-scroll>
+
+</ion-content>
